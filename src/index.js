@@ -1,4 +1,4 @@
-var key = "joO4chN1tmsH8cRF0HeprOd2kwf7GDli"; // !!!32 chars!!!
+// var key = "joO4chN1tmsH8cRF0HeprOd2kwf7GDli"; // !!!32 chars!!!
 const IV_LENGTH = 16;
 
 const crypto = require('crypto');
@@ -22,6 +22,16 @@ function decrypt(text, key) {
     return decrypted.toString();
 }
 
+function generateKey() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 32; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+
 module.exports =  {
 
     createNode: function() {
@@ -32,7 +42,7 @@ module.exports =  {
 
             server: {},
 
-            callback: function() {},
+            key: generateKey(),
 
             initNode: function(port) {
                 this.server = require('socket.io')();
@@ -40,17 +50,20 @@ module.exports =  {
                 this.server.listen(port);
             },
 
+            setupEncryptionKey: function(key) {
+                this.key = key;
+            },
+
             attachToNodes: function(nodesToConnect, callback) {
                 if( typeof nodesToConnect.length !== "number") { consle.error("[E]Expected array!"); return; }
                 for (let i = 0; i < nodesToConnect.length; i++) {
                     const node = nodesToConnect[i];
                     this.nodes.push( { host: 'ws://' + node, socket: require('socket.io-client')('ws://' + node) } );
-                    var x = this.nodes[this.nodes.length-1].host;
+                    var key = this.key;
                     this.nodes[this.nodes.length-1].socket.on('data', function(crypt) {
-                        var data = crypt;
-                        // var data = JSON.parse(decrypt(crypt), key)| {};
-                        // var data = JSON.parse(crypt);
-                        callback(data.data);
+                        var data = decrypt(crypt.data, key);
+                        data = JSON.parse( data );
+                        callback(data);
                     });
                 }
 
@@ -68,8 +81,7 @@ module.exports =  {
             },
 
             emitData: function(data) {
-                // this.server.sockets.emit('data', { data: encrypt(JSON.stringify(data), key) });
-                this.server.sockets.emit('data', { data: data });
+                this.server.sockets.emit('data', { data: encrypt(JSON.stringify(data), this.key) });
             }
 
         };
