@@ -1,4 +1,4 @@
-var dcint = require('../src/index');
+const dcint = require('../src/index');
 
 var startNode = dcint.createNode();
 var firstMiddleNode = dcint.createNode();
@@ -15,13 +15,16 @@ firstMiddleNode.initNode(5000);
 secondMiddleNode.initNode(5500);
 endNode.initNode(6000);
 
-startNode.attachToNodes(['localhost:5000'], function(channel, data) {});
-firstMiddleNode.attachToNodes(['localhost:4000','localhost:5500'], function(channel, data) {});
-secondMiddleNode.attachToNodes(['localhost:5000','localhost:6000'], function(channel, data) {});
-startNode.attachToNodes(['localhost:5000'], function(channel, data, meta) {
+startNode.attachToNodes(['localhost:5000'], function() {});
+firstMiddleNode.attachToNodes(['localhost:4000','localhost:5500'], function() {});
+secondMiddleNode.attachToNodes(['localhost:5000','localhost:6000'], function() {});
+
+endNode.attachToNodes(['localhost:5000'], function(channel, data, meta) {
+    console.timeEnd('chaintest')
     console.log(data);
 });
 
 setTimeout(function() {
-    startNode.emitData('test', {test1:true});
-}, 2500);
+    console.time('chaintest');
+    startNode.emitData('test', {test:true});
+}, 1500);
