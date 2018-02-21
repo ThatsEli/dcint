@@ -22,19 +22,18 @@ function decrypt(text, key) {
     return decrypted.toString();
 }
 
-function generateKey() {
+function randomString(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 32; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    for (var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
 }
 
+module.exports = {
 
-module.exports =  {
-
-    createNode: function() {
+    createNode: function () {
 
         return {
 
@@ -42,46 +41,83 @@ module.exports =  {
 
             server: {},
 
-            key: generateKey(),
+            key: randomString(32),
 
-            initNode: function(port) {
+            initNode: function (port) {
                 this.server = require('socket.io')();
-                this.server.on('connection', function(socket){});
+                this.server.on('connection', function (socket) {});
                 this.server.listen(port);
             },
 
-            setupEncryptionKey: function(key) {
+            setupEncryptionKey: function (key) {
                 this.key = key;
             },
 
-            attachToNodes: function(nodesToConnect, callback) {
-                if( typeof nodesToConnect.length !== "number") { consle.error("[E]Expected array!"); return; }
+            attachToNodes: function (nodesToConnect, callback) {
+                if (typeof nodesToConnect.length !== "number") {
+                    consle.error("[E]Expected array!");
+                    return;
+                }
                 for (let i = 0; i < nodesToConnect.length; i++) {
                     const node = nodesToConnect[i];
-                    this.nodes.push( { host: 'ws://' + node, socket: require('socket.io-client')('ws://' + node) } );
-                    var key = this.key;
-                    this.nodes[this.nodes.length-1].socket.on('data', function(crypt) {
-                        var data = decrypt(crypt.data, key);
-                        data = JSON.parse( data );
-                        callback(data);
+                    this.nodes.push({
+                        host: 'ws://' + node,
+                        socket: require('socket.io-client')('ws://' + node)
+                    });
+
+                    var recievedMessages = [];
+                    var toDoMessages = [];
+
+                    var scope = this;
+
+                    this.nodes[this.nodes.length - 1].socket.on('data', function (crypt) {
+                        var data = JSON.parse(decrypt(crypt.data, scope.key));
+                        var included = false;
+                        for (let m = 0; m < recievedMessages.length; m++) {
+                            if (recievedMessages[m].id == data.id) {
+                                included = true;
+                            }
+                        }
+
+                        if (!included) {
+                            var d = new Date();
+                            recievedMessages.push({
+                                id: data.id, timesamp: d.getTime() 
+                            });
+                            toDoMessages.push({
+                                data: encrypt(JSON.stringify({id: data.id,channel: data.channel,content: data.content,forwardings: ++data.forwardings}), scope.key)
+                            });
+                            callback(data.channel, data.content, { forwardings: data.forwardings });
+
+                            for (let m = 0; m < toDoMessages.length; m++) {
+                                scope.server.sockets.emit('data', toDoMessages[m]);
+                            }
+
+                        }
                     });
                 }
 
             },
 
-            getConnectedNodes: function() {
-                var attachToNodes = [];
-                for (let i = 0; i < this.nodes.length; i++) {
-                    const node  = this.nodes[i];
-                    if(node.socket.connected) {
-                        attachToNodes.push(node.host);
-                    }
-                }
-                return attachToNodes;
+            handleData(data) {
+                
             },
 
-            emitData: function(data) {
-                this.server.sockets.emit('data', { data: encrypt(JSON.stringify(data), this.key) });
+            getConnectedNodes: function () {
+                var connectedNodes = [];
+                for (let i = 0; i < this.nodes.length; i++) {
+                    const node = this.nodes[i];
+                    if (node.socket.connected) {
+                        connectedNodes.push(node.host);
+                    }
+                }
+                return connectedNodes;
+            },
+
+            emitData: function (channel, data) {
+                this.server.sockets.emit('data', 
+                    {data: encrypt(JSON.stringify({id: randomString(80),channel: channel,content: data,forwardings: 0}), this.key)}
+                );
             }
 
         };
