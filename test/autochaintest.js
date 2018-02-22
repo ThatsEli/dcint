@@ -22,6 +22,7 @@ nodes[nodes.length - 1].node.attachToNodes(['localhost:' + nodes[nodes.length - 
 
 setTimeout(function() {
     console.time('test');
+    console.log("Start:");
     nodes[0].node.emitData('test', { test:true });
 }, 5000);
 
