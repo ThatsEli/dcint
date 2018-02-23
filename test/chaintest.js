@@ -10,19 +10,16 @@ firstMiddleNode.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 secondMiddleNode.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 endNode.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 
-startNode.initNode(4000);
-firstMiddleNode.initNode(5000);
-secondMiddleNode.initNode(5500);
-endNode.initNode(6000);
+startNode.initNode(4000, function() {});
+firstMiddleNode.initNode(5000, function() {});
+secondMiddleNode.initNode(5500, function() {});
+endNode.initNode(6000, function(channel, data, meta) { console.log(data);  });
 
-startNode.attachToNodes(['localhost:5000'], function() {});
-firstMiddleNode.attachToNodes(['localhost:4000','localhost:5500'], function() {});
-secondMiddleNode.attachToNodes(['localhost:5000','localhost:6000'], function() {});
+startNode.attachToNodes(['localhost:5000']);
+firstMiddleNode.attachToNodes(['localhost:4000','localhost:5500']);
+secondMiddleNode.attachToNodes(['localhost:5000','localhost:6000']);
 
-endNode.attachToNodes(['localhost:5000'], function(channel, data, meta) {
-    console.timeEnd('chaintest')
-    console.log(data);
-});
+endNode.attachToNodes(['localhost:5000']);
 
 setTimeout(function() {
     console.time('chaintest');
