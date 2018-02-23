@@ -51,58 +51,60 @@ module.exports = {
 
             key: randomString(32),
 
-            initNode: function (port, callback) {
+            initNode: function (port, subscribedChannels, callback) {
                 this.server = require('socket.io')();
                 this.server.on('connection', function (socket) {});
                 this.server.listen(port);
 
                 var scope = this;
 
-                this.server.on('connect', function(socket) {
+                this.server.on('connect', function (socket) {
                     var toDoMessages = [];
                     var recievedMessages = [];
                     socket.on('data', function (crypt) {
-                        // console.log("x");
-    
-                        var data = JSON.parse(decrypt(crypt.data, scope.key));
+
                         var included = false;
                         for (let m = 0; m < recievedMessages.length; m++) {
-                            if (recievedMessages[m].id == data.id) {
+                            if (recievedMessages[m].id == crypt.id) {
                                 included = true;
                             }
                         }
 
                         if (!included) {
-                            var d = new Date();
-                            recievedMessages.push({
-                                id: data.id,
-                                timesamp: d.getTime()
-                            });
-                            toDoMessages.push({
-                                data: encrypt(JSON.stringify({
-                                    id: data.id,
-                                    channel: data.channel,
-                                    content: data.content,
-                                    forwardings: ++data.forwardings
-                                }), scope.key)
-                            });
-                            callback(data.channel, data.content, {
-                                forwardings: data.forwardings
-                            });
 
-                            // console.log(data.content);
-
-                            for (let m = 0; m < toDoMessages.length; m++) {
-                                const message = toDoMessages[m];
-                                for (let i = 0; i < scope.nodes.length; i++) {
-                                    const node = scope.nodes[i];
-                                    node.socket.emit('data', message);
-                                }
+                            if (subscribedChannels.includes(crypt.channel) || subscribedChannels.length == 0 | subscribedChannels[0] == '*') {
+                                var data = JSON.parse(decrypt(crypt.data, scope.key));
+                                callback(crypt.channel, data.content, {
+                                    forwardings: crypt.forwardings
+                                });
                             }
 
+                            var d = new Date();
+                            recievedMessages.push({
+                                id: crypt.id,
+                                timesamp: d.getTime()
+                            });
+
+                            for (let i = 0; i < scope.nodes.length; i++) {
+                                const node = scope.nodes[i];
+                                node.socket.emit('data', {
+                                    data: crypt.data,
+                                    id: crypt.id,
+                                    channel: crypt.channel,
+                                    forwardings: ++crypt.forwardings
+                                });
+                            }
                         }
                     });
                 });
+            },
+
+            subscribeChannel: function (channel) {
+                this.subscribedChannels.push(channel);
+            },
+
+            unSubscribeChannel: function (channel) {
+                this.subscribedChannels.splice(this.subscribedChannels.indexOf(channel), 1);
             },
 
             setupEncryptionKey: function (key) {
@@ -141,11 +143,11 @@ module.exports = {
                     const node = this.nodes[i];
                     node.socket.emit('data', {
                         data: encrypt(JSON.stringify({
-                            id: randomString(80),
-                            channel: channel,
                             content: data,
-                            forwardings: 0
-                        }), this.key)
+                        }), this.key),
+                        id: randomString(80),
+                        channel: channel,
+                        forwardings: 0
                     });
                 }
             }
