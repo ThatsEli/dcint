@@ -51,34 +51,19 @@ module.exports = {
 
             key: randomString(32),
 
-            initNode: function (port) {
+            initNode: function (port, callback) {
                 this.server = require('socket.io')();
                 this.server.on('connection', function (socket) {});
                 this.server.listen(port);
-            },
 
-            setupEncryptionKey: function (key) {
-                this.key = key;
-            },
+                var scope = this;
 
-            attachToNodes: function (nodesToConnect, callback) {
-                if (typeof nodesToConnect.length !== "number") {
-                    consle.error("[E]Expected array!");
-                    return;
-                }
-                for (let i = 0; i < nodesToConnect.length; i++) {
-                    const node = nodesToConnect[i];
-                    this.nodes.push({
-                        host: 'ws://' + node,
-                        socket: require('socket.io-client')('ws://' + node)
-                    });
-
-                    var recievedMessages = [];
+                this.server.on('connect', function(socket) {
                     var toDoMessages = [];
-
-                    var scope = this;
-
-                    this.nodes[this.nodes.length - 1].socket.on('data', function (crypt) {
+                    var recievedMessages = [];
+                    socket.on('data', function (crypt) {
+                        // console.log("x");
+    
                         var data = JSON.parse(decrypt(crypt.data, scope.key));
                         var included = false;
                         for (let m = 0; m < recievedMessages.length; m++) {
@@ -105,17 +90,38 @@ module.exports = {
                                 forwardings: data.forwardings
                             });
 
+                            // console.log(data.content);
+
                             for (let m = 0; m < toDoMessages.length; m++) {
-                                scope.server.sockets.emit('data', toDoMessages[m]);
+                                const message = toDoMessages[m];
+                                for (let i = 0; i < scope.nodes.length; i++) {
+                                    const node = scope.nodes[i];
+                                    node.socket.emit('data', message);
+                                }
                             }
 
                         }
                     });
-                }
-
+                });
             },
 
-            handleData(data) {
+            setupEncryptionKey: function (key) {
+                this.key = key;
+            },
+
+            attachToNodes: function (nodesArray) {
+
+                if (typeof nodesArray.length !== "number") {
+                    consle.error("[E]Expected array!");
+                    return;
+                }
+                for (let i = 0; i < nodesArray.length; i++) {
+                    const node = nodesArray[i];
+                    this.nodes.push({
+                        host: 'ws://' + node,
+                        socket: require('socket.io-client')('ws://' + node)
+                    });
+                }
 
             },
 
@@ -131,14 +137,17 @@ module.exports = {
             },
 
             emitData: function (channel, data) {
-                this.server.sockets.emit('data', {
-                    data: encrypt(JSON.stringify({
-                        id: randomString(80),
-                        channel: channel,
-                        content: data,
-                        forwardings: 0
-                    }), this.key)
-                });
+                for (let i = 0; i < this.nodes.length; i++) {
+                    const node = this.nodes[i];
+                    node.socket.emit('data', {
+                        data: encrypt(JSON.stringify({
+                            id: randomString(80),
+                            channel: channel,
+                            content: data,
+                            forwardings: 0
+                        }), this.key)
+                    });
+                }
             }
 
         };
