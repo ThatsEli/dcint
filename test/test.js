@@ -5,9 +5,9 @@ var node1 = dcint.createNode(); var node2 = dcint.createNode(); // instanciate t
 node1.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
 node2.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
 
-node1.initNode(4000, function() {});
-node2.initNode(5000, function(channel, data, meta) {
-    console.log(data);
+node1.initNode(4000, ['*'], function() {});
+node2.initNode(5000, ['*'], function(channel, data, meta) {
+    console.log(channel + "|" + data);
 });
 
 node1.attachToNodes(['localhost:5000']);
