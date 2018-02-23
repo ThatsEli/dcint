@@ -26,10 +26,9 @@ for (let i = 1; i < nodes.length - 1; i++) {
     
 }
 
-nodes[nodes.length - 1].node.attachToNodes(['localhost:' + nodes[nodes.length - 2].port], function(channel, data, meta) { console.timeEnd('test'); console.log(nodes[nodes.length - 1].port); console.log(meta.forwardings); });
-
+nodes[nodes.length - 1].node.attachToNodes(['localhost:' + nodes[nodes.length - 2].port], function(channel, data, meta) { /* console.timeEnd('test'); */ console.log(nodes[nodes.length - 1].port); console.log(meta.forwardings); });
 setTimeout(function() {
-    console.time('test');
+    // console.time('test');
     console.log("Start:");
     nodes[10].node.emitData('test', { test:true });
 }, 1000);
