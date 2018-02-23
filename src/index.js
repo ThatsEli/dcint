@@ -1,4 +1,12 @@
-// var key = "joO4chN1tmsH8cRF0HeprOd2kwf7GDli"; // !!!32 chars!!!
+/***************************************************************************
+ *                                                                         *
+ *   Copyright (C) 2018 by thatseli                                        *
+ *   All rights reserved                                                   *
+ *                                                                         *
+ *   http://thatseliyt.de <public@thatseliyt.de                            *
+ *                                                                         *
+ ***************************************************************************/
+
 const IV_LENGTH = 16;
 
 const crypto = require('crypto');
@@ -82,12 +90,20 @@ module.exports = {
                         if (!included) {
                             var d = new Date();
                             recievedMessages.push({
-                                id: data.id, timesamp: d.getTime() 
+                                id: data.id,
+                                timesamp: d.getTime()
                             });
                             toDoMessages.push({
-                                data: encrypt(JSON.stringify({id: data.id,channel: data.channel,content: data.content,forwardings: ++data.forwardings}), scope.key)
+                                data: encrypt(JSON.stringify({
+                                    id: data.id,
+                                    channel: data.channel,
+                                    content: data.content,
+                                    forwardings: ++data.forwardings
+                                }), scope.key)
                             });
-                            callback(data.channel, data.content, { forwardings: data.forwardings });
+                            callback(data.channel, data.content, {
+                                forwardings: data.forwardings
+                            });
 
                             for (let m = 0; m < toDoMessages.length; m++) {
                                 scope.server.sockets.emit('data', toDoMessages[m]);
@@ -100,7 +116,7 @@ module.exports = {
             },
 
             handleData(data) {
-                
+
             },
 
             getConnectedNodes: function () {
@@ -115,9 +131,14 @@ module.exports = {
             },
 
             emitData: function (channel, data) {
-                this.server.sockets.emit('data', 
-                    {data: encrypt(JSON.stringify({id: randomString(80),channel: channel,content: data,forwardings: 0}), this.key)}
-                );
+                this.server.sockets.emit('data', {
+                    data: encrypt(JSON.stringify({
+                        id: randomString(80),
+                        channel: channel,
+                        content: data,
+                        forwardings: 0
+                    }), this.key)
+                });
             }
 
         };
