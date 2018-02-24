@@ -87,12 +87,15 @@ module.exports = {
 
                             var messageIndex = recievedMessages.length - 1;
 
-                            setTimeout(function() {
-                                recievedMessages.splice(messageIndex, 1);
-                            },  (1000 * 60) * 1  );
-                            // if(recievedMessages.length == 100) {
+                            //faster but uses 5x more cpu and leaks memory (500- 20000 (yes, 20k) messages / second )
+                            // setTimeout(function() {
                             //     recievedMessages.shift();
-                            // }
+                            // }, 10  );
+
+                            //slower but waaay more efficient(around 700 messages / second)
+                            if(recievedMessages.length == 100) {
+                                recievedMessages.shift();
+                            }
 
                             for (let i = 0; i < scope.nodes.length; i++) {
                                 const node = scope.nodes[i];
