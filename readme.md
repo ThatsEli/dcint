@@ -38,6 +38,19 @@ setTimeout(function() {
     node1.emitData('test', {test1:true}); // emit data to all connected nodes, node 2 in this case
 }, 2000);
 ```
+## Performance
+
+A DCINT node can process around 725 messages per second (tested on a 3.5 Ghz core (i5-6600K)).
+
+### History:
+
++ The first(Before rewrite) version of DCINT could process around 100 messages/second but dropped quickly to 0 or 1
++ The second(Not optimized) and third(Optimized) version both performed at around 700 message/second but started dropping after 40 seconds. Both versions also used an imense amount of memory and CPU(maxed out the active core) after some time!
++ The fourth and current version stays stable at 725 message/second average while using 30MB RAM and 4% CPU(4 threads) (After RAM optimization)
+
+
+![alt text](https://i.imgur.com/gvWmKuS.png "Comparison")
+
 
 ## Installation
 
