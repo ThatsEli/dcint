@@ -2,6 +2,8 @@ var dcint = require('../src/index');
 
 var node1 = dcint.createNode(); var node2 = dcint.createNode();
 
+var results = 0;
+
 function randomString(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -16,24 +18,25 @@ var send = 0;
 node1.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 node2.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 
-node1.initNode(4000);
-node2.initNode(5000);
-
-node1.attachToNodes(['localhost:5000'], function(channel, data, meta) {});
-
-node2.attachToNodes(['localhost:4000'], function(channel, data, meta) {
+node1.initNode(4000, ['*'], function() {});
+node2.initNode(5000, ['*'], function(channel, data, meta) {
     send++;
-    node1.emitData('test', {timer:0});
+    node1.emitData('test', {});
 });
 
+node1.attachToNodes(['localhost:5000']);
+
+node2.attachToNodes(['localhost:4000']);
+
 setTimeout(function() {
-    node1.emitData('test', {timer:0});
+    node1.emitData('test', {});
 }, 10);
 
 setInterval(function() {
-    var d = new Date();
-    console.log( d.getTime() + " " +  send + "");
+    console.log(  Math.floor(process.uptime()) + " " +  send + "");
     send = 0;
+    results++;
+    if(results == 300) { process.exit(); }
 }, 1000);
 
 

@@ -85,6 +85,15 @@ module.exports = {
                                 timesamp: d.getTime()
                             });
 
+                            var messageIndex = recievedMessages.length - 1;
+
+                            setTimeout(function() {
+                                recievedMessages.splice(messageIndex, 1);
+                            },  (1000 * 60) * 1  );
+                            // if(recievedMessages.length == 100) {
+                            //     recievedMessages.shift();
+                            // }
+
                             for (let i = 0; i < scope.nodes.length; i++) {
                                 const node = scope.nodes[i];
                                 node.socket.emit('data', {
