@@ -3,7 +3,7 @@
  *   Copyright (C) 2018 by thatseli                                        *
  *   All rights reserved                                                   *
  *                                                                         *
- *   http://thatseliyt.de <public@thatseliyt.de                            *
+ *   http://thatseliyt.de <public@thatseliyt.de>                           *
  *                                                                         *
  ***************************************************************************/
 
@@ -79,23 +79,9 @@ module.exports = {
                                 });
                             }
 
-                            var d = new Date();
                             recievedMessages.push({
                                 id: crypt.id,
-                                timesamp: d.getTime()
                             });
-
-                            var messageIndex = recievedMessages.length - 1;
-
-                            //faster but uses 5x more cpu and leaks memory (500- 20000 (yes, 20k) messages / second )
-                            // setTimeout(function() {
-                            //     recievedMessages.shift();
-                            // }, 10  );
-
-                            //slower but waaay more efficient(around 700 messages / second)
-                            if(recievedMessages.length == 100) {
-                                recievedMessages.shift();
-                            }
 
                             for (let i = 0; i < scope.nodes.length; i++) {
                                 const node = scope.nodes[i];
@@ -105,6 +91,16 @@ module.exports = {
                                     channel: crypt.channel,
                                     forwardings: ++crypt.forwardings
                                 });
+                            }
+
+                            //better but slower,uses 2x more cpu and memory
+                            // setTimeout(function() {
+                            //     recievedMessages.shift();
+                            // }, 1000 * 10  );
+
+                            //worse but is fast and more efficient
+                            if(recievedMessages.length == 100) {
+                                recievedMessages.shift();
                             }
                         }
                     });

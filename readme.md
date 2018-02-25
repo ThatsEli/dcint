@@ -15,6 +15,10 @@ Small disclaimer: This is my first npm module :)
 * decentralization AND direct communication
 * fast prcessing time
 
+## Documentation
+
+[LINK](https://github.com/ThatsEli/dcint/blob/master/documentation/Documentation.md)
+
 ## Simple usage / example
 
 ```js

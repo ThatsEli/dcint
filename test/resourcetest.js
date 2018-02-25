@@ -32,11 +32,13 @@ setTimeout(function() {
     node1.emitData('test', {});
 }, 10);
 
+var total = 0;
+
 setInterval(function() {
-    console.log(  Math.floor(process.uptime()) + " " +  send + "");
+    total += send;
     send = 0;
     results++;
-    if(results == 300) { process.exit(); }
+    if(results == 120) { console.log(process.memoryUsage().heapUsed / 1000000 + "MB |" + total / 120);  process.exit(); }
 }, 1000);
 
 
