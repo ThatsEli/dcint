@@ -35,8 +35,8 @@ setTimeout(function() {
 setInterval(function() {
     console.log(  Math.floor(process.uptime()) + " " +  send + "");
     send = 0;
-    results++;
-    if(results == 300) { process.exit(); }
+    // results++;
+    // if(results == 300) { process.exit(); }
 }, 1000);
 
 
