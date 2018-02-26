@@ -63,6 +63,12 @@ module.exports = {
                     var recievedMessages = [];
                     socket.on('data', function (crypt) {
 
+                        if(crypt == undefined) { return; }
+                        if(crypt.id == undefined ) { return; }
+                        if(crypt.data == undefined ) { return; }
+                        if(crypt.channel == undefined ) { crypt.channel = ""; }
+                        if(crypt.forwardings == undefined ) { crypt.forwardings = 0; }
+
                         var included = false;
                         for (let m = 0; m < recievedMessages.length; m++) {
                             if (recievedMessages[m].id == crypt.id) {
@@ -73,10 +79,15 @@ module.exports = {
                         if (!included) {
 
                             if (subscribedChannels.includes(crypt.channel) || subscribedChannels.length == 0 | subscribedChannels[0] == '*') {
-                                var data = JSON.parse(decrypt(crypt.data, scope.key));
-                                callback(crypt.channel, data.content, {
-                                    forwardings: crypt.forwardings
-                                });
+                                try {
+                                    var data = JSON.parse(decrypt(crypt.data, scope.key));
+                                    callback(crypt.channel, data.content, {
+                                        forwardings: crypt.forwardings
+                                    });
+                                } catch (error) {
+                                    return { error: true, errorData = error };
+                                }
+
                             }
 
                             recievedMessages.push({
@@ -119,14 +130,14 @@ module.exports = {
                 this.key = key;
             },
 
-            attachToNodes: function (nodesArray) {
+            attachToNodes: function (nodes) {
 
-                if (typeof nodesArray.length !== "number") {
+                if (typeof nodes.length !== "number") {
                     consle.error("[E]Expected array!");
                     return;
                 }
-                for (let i = 0; i < nodesArray.length; i++) {
-                    const node = nodesArray[i];
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
                     this.nodes.push({
                         host: 'ws://' + node,
                         socket: require('socket.io-client')('ws://' + node)
@@ -134,6 +145,10 @@ module.exports = {
                 }
 
             },
+
+            // requestAttach(nodes, attachKey) {
+
+            // },
 
             getConnectedNodes: function () {
                 var connectedNodes = [];
@@ -162,7 +177,5 @@ module.exports = {
 
         };
     },
-
-
 
 };
