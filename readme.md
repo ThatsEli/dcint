@@ -2,6 +2,9 @@
 
 ### **D**e**C**entralized**I**nter**N**ode**T**ransfer
 
+Last build:![Build](https://circleci.com/gh/ThatsEli/dcint.png?circle-token=b2c9843af512cb833ed408b695addddc01a0cdaf "Build")
+
+
 ## Whats is this?
 
 You can use this module to send data between nodes. It has special "feautures" like decentralization and strong encryption.
@@ -56,7 +59,7 @@ A DCINT node can process around 725 messages per second (tested on a 3.5 Ghz cor
 + The fourth and current version stays stable at 725 message/second average while using 30MB RAM and 4% CPU(4 threads) (After RAM optimization)
 
 
-![alt text](https://i.imgur.com/gvWmKuS.png "Comparison")
+![Comparison](https://i.imgur.com/gvWmKuS.png "Comparison")
 
 
 ## Installation
