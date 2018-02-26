@@ -2,8 +2,8 @@ var dcint = require('../src/index'); // require dcint
 
 var node1 = dcint.createNode(); var node2 = dcint.createNode(); // instanciate the first and 2nd node
 
-node1.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
-node2.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
+node1.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
+node2.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli"); // set the same encryption key for both
 
 node1.initNode(4000, ['*'], function() {}); // initiate the node
 node2.initNode(5000, ['*'], function(channel, data, meta) {// initiate the node and attach a callback 

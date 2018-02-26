@@ -1,6 +1,6 @@
 {
   "name": "dcint",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "a decentralized method to share data encrypted between nodes",
   "main": "src/index.js",
   "directories": {

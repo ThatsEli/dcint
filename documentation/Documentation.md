@@ -5,7 +5,7 @@
 + dcint
 	+ createNode()
 + node
-	+ [setupEncryptionKey(key)](#setupencryptionkeykey)
+	+ [setEncryptionKey(key)](#setencryptionkeykey)
 	+ [initnode(port, channelFilter, callback)](#initnodeport-channelfilter-callback)
 	+ [attachToNodes(nodes)](#attachtonodesnodes)
 	+ [getConnectedNodes()](#getconnectednodes)
@@ -21,9 +21,9 @@ const dcint = require('dcint');
 
 # object: node
 
-## setupEncryptionKey(key)
+## setEncryptionKey(key)
 ```js
-node.setupEncryptionKey(key)
+node.setEncryptionKey(key)
 ```
 **Description**: 
 Sets the key used for encryption by the node
