@@ -7,13 +7,11 @@
  *                                                                         *
  ***************************************************************************/
 
-const IV_LENGTH = 16;
-
 const crypto = require('crypto');
 
 
 function encrypt(text, key) {
-    let iv = crypto.randomBytes(IV_LENGTH);
+    let iv = crypto.randomBytes(16);
     let cipher = crypto.createCipheriv('aes-256-cbc', new Buffer(key), iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -39,7 +37,7 @@ function randomString(length) {
     return text;
 }
 
-module.exports = {
+var exportObj = {
 
     createNode: function () {
 
@@ -85,7 +83,7 @@ module.exports = {
                                         forwardings: crypt.forwardings
                                     });
                                 } catch (error) {
-                                    return { error: true, errorData = error };
+                                    return;
                                 }
 
                             }
@@ -95,8 +93,7 @@ module.exports = {
                             });
 
                             for (let i = 0; i < scope.nodes.length; i++) {
-                                const node = scope.nodes[i];
-                                node.socket.emit('data', {
+                                scope.nodes[i].socket.emit('data', {
                                     data: crypt.data,
                                     id: crypt.id,
                                     channel: crypt.channel,
@@ -104,13 +101,13 @@ module.exports = {
                                 });
                             }
 
-                            //better but slower,uses 2x more cpu and memory
+                            //better but slower, uses 2x more cpu and memory
                             // setTimeout(function() {
                             //     recievedMessages.shift();
                             // }, 1000 * 10  );
 
                             //worse but is fast and more efficient
-                            if(recievedMessages.length == 100) {
+                            if(recievedMessages.length == 500) {
                                 recievedMessages.shift();
                             }
                         }
@@ -118,15 +115,7 @@ module.exports = {
                 });
             },
 
-            subscribeChannel: function (channel) {
-                this.subscribedChannels.push(channel);
-            },
-
-            unSubscribeChannel: function (channel) {
-                this.subscribedChannels.splice(this.subscribedChannels.indexOf(channel), 1);
-            },
-
-            setupEncryptionKey: function (key) {
+            setEncryptionKey: function (key) {
                 this.key = key;
             },
 
@@ -146,25 +135,17 @@ module.exports = {
 
             },
 
-            // requestAttach(nodes, attachKey) {
-
-            // },
-
             getConnectedNodes: function () {
                 var connectedNodes = [];
                 for (let i = 0; i < this.nodes.length; i++) {
-                    const node = this.nodes[i];
-                    if (node.socket.connected) {
-                        connectedNodes.push(node.host);
-                    }
+                    connectedNodes.push(this.nodes[i].host);
                 }
                 return connectedNodes;
             },
 
             emitData: function (channel, data) {
                 for (let i = 0; i < this.nodes.length; i++) {
-                    const node = this.nodes[i];
-                    node.socket.emit('data', {
+                    this.nodes[i].socket.emit('data', {
                         data: encrypt(JSON.stringify({
                             content: data,
                         }), this.key),
@@ -179,3 +160,5 @@ module.exports = {
     },
 
 };
+
+module.exports = exportObj;
