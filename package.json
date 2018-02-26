@@ -1,22 +1,26 @@
 {
   "name": "dcint",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "a decentralized method to share data encrypted between nodes",
   "main": "src/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "jest"
+    "test": "mocha test/unit/ --exit"
   },
   "author": "ThatsEli <public@thatseliyt.de> (http://thatseliyt.de)",
   "license": "see heading(src/index.js)",
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/ThatsEli/dcint.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ThatsEli/dcint.git"
   },
   "dependencies": {
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.1"
   }
 }

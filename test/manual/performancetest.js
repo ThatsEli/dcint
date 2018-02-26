@@ -15,8 +15,8 @@ function randomString(length) {
 
 var send = 0;
 
-node1.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
-node2.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
+node1.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
+node2.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 
 node1.initNode(4000, ['*'], function() {});
 node2.initNode(5000, ['*'], function(channel, data, meta) {
