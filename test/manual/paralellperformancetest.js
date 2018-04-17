@@ -24,11 +24,13 @@ node1.attachToNodes(['localhost:5000']);
 node2.attachToNodes(['localhost:4000']);
 
 setTimeout(function() {
-    node1.emitData('test', {});
+    for (let i = 0; i < 50; i++) {
+        node1.emitData('test', {});
+    }
 }, 10);
 
 setInterval(function() {
-    console.log(  Math.floor(process.uptime()) + " " +  send + "");
+    console.log(send);
     send = 0;
     results++;
     if(results == 300) { process.exit(); }

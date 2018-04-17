@@ -1,28 +1,17 @@
-var dcint = require('../src/index');
+var dcint = require('../../lib');
 
-var node1 = dcint.createNode(); var node2 = dcint.createNode();
-
-var results = 0;
-
-function randomString(length) {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-}
-
-var send = 0;
-
-node1.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
-node2.setupEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
-
-node1.initNode(4000, ['*'], function() {});
-node2.initNode(5000, ['*'], function(channel, data, meta) {
+var node1 = new dcint.Node(4000, ['*'], () => {}); 
+var node2 = new dcint.Node(5000, ['*'], (channel, data, meta) => {
     send++;
     node1.emitData('test', {});
 });
+
+var results = 0;
+
+var send = 0;
+
+node1.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
+node2.setEncryptionKey("joO4chN1tmsH8cRF0HeprOd2kwf7GDli");
 
 node1.attachToNodes(['localhost:5000']);
 

@@ -1,3 +1,4 @@
 test/
 .git/
 node_modules/
+.circleci/
