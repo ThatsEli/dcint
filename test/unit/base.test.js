@@ -38,5 +38,4 @@ describe("Base test", function () {
             });
         }, 50);
     });
-
 });
