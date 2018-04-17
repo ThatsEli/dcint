@@ -2,11 +2,8 @@
 ### **D**e**C**entralized**I**nter**N**ode**T**ransfer
 
 ## Table of contents
-+ dcint
-	+ createNode()
 + node
 	+ [setEncryptionKey(key)](#setencryptionkeykey)
-	+ [initnode(port, channelFilter, callback)](#initnodeport-channelfilter-callback)
 	+ [attachToNodes(nodes)](#attachtonodesnodes)
 	+ [getConnectedNodes()](#getconnectednodes)
 	+ [emitData(channel, data)](#emitdatachannel-data)
@@ -19,7 +16,15 @@ dcint can be required as an npm module
 const dcint = require('dcint');
 ```
 
-# object: node
+# class: node
+
+## Create a new node
+
+You can create a new node with the arguments:
+
+* port: number          (port for the node to listen on)
+* subscribedChannels: Array<String>          (array of channels to subscribe to,use ['*'] to subscribe to any channel)
+* callback: Function         (function to be called when ready)
 
 ## setEncryptionKey(key)
 ```js
@@ -29,34 +34,13 @@ node.setEncryptionKey(key)
 Sets the key used for encryption by the node
 
 **Arguments**:
-+ key(string): define the key that should be used for encryption, must be !**32 chars**
++ key: string: | define the key that should be used for encryption, must be !**32 chars**!
 
-**Returns**: undefined
+**Returns**: void
 
 **Example**:
 ```js
 node.setupEncryptionKey('joO4chN1tmsH8cRF0HeprOd2kwf7GDli')
-```
-
-##  initnode(port, channelFilter, callback)
-```js
-node.initnode(port, channelFilter, callback)
-```
-**Description**: 
-Initiates the node: listens on port, filters its messages with the given filter and calls the callback on data
-
-**Arguments**:
-+ port(number): port for the node to listen on
-+ channelFilter(array): array with filters, see channelFilter
-+ callback(function): function to be called on incommign data with the arguments [channel, data, meta]
-
-**Returns**: undefined
-
-**Example**:
-```js
-node2.initNode(5000, ['*'], function(channel, data, meta) {
-    console.log(channel + ":" + data);
-});
 ```
 
 ## attachToNodes(nodes)
@@ -67,9 +51,9 @@ node.attachToNodes(nodes)
 The node connect to the new nodes
 
 **Arguments**:
-+ nodesArray(array): nodes to attach to
++ nodesArray: Array<String> | nodes to attach to, use ['*'] to subscribe to all channels
 
-**Returns**: undefined
+**Returns**: void
 
 **Example**:
 ```js
@@ -87,7 +71,7 @@ Returns an array with the currently connected nodes
 /
 
 **Returns**: 
-+ nodes(array): array that includes nodes to which the current ndoe is connected to
++ Array<Node>: array that includes nodes which the current ndoe is connected to
 
 **Example**:
 ```js
@@ -102,10 +86,10 @@ node.emitData(channel, data)
 Emits data to all other nodes in the network
 
 **Arguments**:
-+ channel(string): channel to emit to
-+ data(object): data to emit
++ channel: string | channel to emit to
++ data: object| data to emit
 
-**Returns**: undefined
+**Returns**: void
 
 **Example**:
 ```js
