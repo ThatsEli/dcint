@@ -20,8 +20,6 @@ export class Node {
         this.key = stringsTools.randomString(32);
         this.nodes = [];
 
-        let scope: this = this;
-
 
         this.server.on('connection', (socket: Socket) => {
             let receivedMessages: Crypt[] = [];
@@ -31,19 +29,16 @@ export class Node {
                 if(crypt == undefined) { return; }
                 if(crypt.id == undefined ) { return; }
                 if(crypt.data == undefined ) { return; }
-                if(crypt.channel == undefined ) { crypt.channel = ""; }
-                if(crypt.forwardings == undefined ) { crypt.forwardings = 0; }
+                if(crypt.channel == undefined ) { return; }
+                if(crypt.forwardings == undefined ) { return; }
 
                 let included: boolean = false;
-                if(receivedMessages.some((m) => { return m.id === crypt.id })) {
-                    included = true;
-                }
+                included = receivedMessages.some((m) => { return m.id === crypt.id });
 
                 if (!included) {
                     // @ts-ignore
                     if (subscribedChannels.includes(crypt.channel) || subscribedChannels.length == 0 || subscribedChannels[0] == '*') {
                         try {
-                            // console.log(crypt.id, hash(crypt.data));
                             if(crypt.id == hash(crypt.data)) {
                                 callback(crypt.channel, JSON.parse(cryptTools.decrypt(crypt.data, this.key)).content, {
                                     forwardings: crypt.forwardings
@@ -51,27 +46,22 @@ export class Node {
                             }
                         } catch (error) { return; }
                     }
+                    
+                    crypt.forwardings = ++crypt.forwardings;
 
-                    let cryptObj: Crypt = {
-                        data: crypt.data,
-                        id: crypt.id,
-                        channel: crypt.channel,
-                        forwardings: ++crypt.forwardings
-                    };
-
-                    receivedMessages.push(cryptObj);
+                    receivedMessages.push(crypt);
 
                     for (let i: number = 0; i < this.nodes.length; i++) {
-                        this.nodes[i].socket.emit('data', cryptObj);
+                        this.nodes[i].socket.emit('data', crypt);
                     }
 
                     //better but slower, uses more cpu and memory
                     // setTimeout(function() {
-                    //     recievedMessages.shift();
+                    //     receivedMessages.shift();
                     // }, 1000 * 10  );
 
                     //worse but is fast and more efficient
-                    if(receivedMessages.length == this.bufferSize) {
+                    if(receivedMessages.length === this.bufferSize) {
                         receivedMessages.shift();
                     }
                 }
@@ -102,11 +92,11 @@ export class Node {
     }
 
     emitData(channel: string, data: object): void {
-        let dataObj: any = {
+        let dataObj: Crypt = {
             data: cryptTools.encrypt(JSON.stringify({
                 content: data,
             }), this.key),
-            // id: stringsTools.randomString(80),
+            id: '',
             channel: channel,
             forwardings: 0
         }; dataObj.id = hash(dataObj.data);

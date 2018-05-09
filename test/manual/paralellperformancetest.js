@@ -24,7 +24,7 @@ node1.attachToNodes(['localhost:5000']);
 node2.attachToNodes(['localhost:4000']);
 
 setTimeout(function() {
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 5000; i++) {
         node1.emitData('test', {});
     }
 }, 10);
@@ -33,7 +33,7 @@ setInterval(function() {
     console.log(send);
     send = 0;
     results++;
-    if(results == 300) { process.exit(); }
+    if(results == 15) { process.exit(); }
 }, 1000);
 
 
